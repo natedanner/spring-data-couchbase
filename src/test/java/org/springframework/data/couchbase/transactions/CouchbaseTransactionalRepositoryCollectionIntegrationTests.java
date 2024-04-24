@@ -109,12 +109,11 @@ public class CouchbaseTransactionalRepositoryCollectionIntegrationTests extends 
 	public void saveRolledBack() {
 		String id = UUID.randomUUID().toString();
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			userService.run(repo -> {
 				UserCol user = repo.save(new UserCol(id, "Ada", "Lovelace"));
 				SimulateFailureException.throwEx("fail");
-			});
-		}, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+			}), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
 		UserCol user = userRepo.getOperations().findById(UserCol.class).one(id);
 		assertNull(user);

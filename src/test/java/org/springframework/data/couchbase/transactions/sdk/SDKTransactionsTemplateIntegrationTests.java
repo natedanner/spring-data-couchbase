@@ -196,13 +196,12 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 	public void rollbackInsert() {
 		AtomicInteger attempts = new AtomicInteger();
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				attempts.incrementAndGet();
 				Person person = ops.insertById(Person.class).one(WalterWhite);
 				throw new SimulateFailureException();
-			});
-		}, TransactionFailedException.class, SimulateFailureException.class);
+			}), TransactionFailedException.class, SimulateFailureException.class);
 
 		Person fetched = ops.findById(Person.class).one(WalterWhite.id());
 		assertNull(fetched);
@@ -215,15 +214,14 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 		AtomicInteger attempts = new AtomicInteger();
 		Person person = ops.insertById(Person.class).one(WalterWhite);
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				attempts.incrementAndGet();
 				Person p = ops.findById(Person.class).one(person.id());
 				p.setFirstname("changed");
 				ops.replaceById(Person.class).one(p);
 				throw new SimulateFailureException();
-			});
-		}, TransactionFailedException.class, SimulateFailureException.class);
+			}), TransactionFailedException.class, SimulateFailureException.class);
 
 		Person fetched = ops.findById(Person.class).one(person.id());
 		assertEquals(WalterWhite.getFirstname(), fetched.getFirstname());
@@ -236,14 +234,13 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 		AtomicInteger attempts = new AtomicInteger();
 		Person person = ops.insertById(Person.class).one(WalterWhite);
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				attempts.incrementAndGet();
 				Person p = ops.findById(Person.class).one(person.id());
 				ops.removeById(Person.class).oneEntity(p);
 				throw new SimulateFailureException();
-			});
-		}, TransactionFailedException.class, SimulateFailureException.class);
+			}), TransactionFailedException.class, SimulateFailureException.class);
 
 		Person fetched = ops.findById(Person.class).one(person.getId().toString());
 		assertNotNull(fetched);
@@ -256,13 +253,12 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 		AtomicInteger attempts = new AtomicInteger();
 		Person person = ops.insertById(Person.class).one(WalterWhite.withIdFirstname());
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				attempts.incrementAndGet();
 				ops.removeByQuery(Person.class).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all();
 				throw new SimulateFailureException();
-			});
-		}, TransactionFailedException.class, SimulateFailureException.class);
+			}), TransactionFailedException.class, SimulateFailureException.class);
 
 		Person fetched = ops.findById(Person.class).one(person.id());
 		assertNotNull(fetched);
@@ -275,13 +271,12 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 		AtomicInteger attempts = new AtomicInteger();
 		Person person = ops.insertById(Person.class).one(WalterWhite.withIdFirstname());
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				attempts.incrementAndGet();
 				ops.findByQuery(Person.class).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all();
 				throw new SimulateFailureException();
-			});
-		}, TransactionFailedException.class, SimulateFailureException.class);
+			}), TransactionFailedException.class, SimulateFailureException.class);
 
 		assertEquals(1, attempts.get());
 	}
@@ -296,11 +291,10 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 
 		assertNotEquals(person.getVersion(), refetched.getVersion());
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				ops.replaceById(Person.class).one(person);
-			}, TransactionOptions.transactionOptions().timeout(Duration.ofSeconds(2)));
-		}, TransactionFailedException.class);
+			}, TransactionOptions.transactionOptions().timeout(Duration.ofSeconds(2))), TransactionFailedException.class);
 
 	}
 
@@ -309,12 +303,11 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 	public void replaceEntityWithoutCas() {
 		PersonWithoutVersion person = ops.insertById(PersonWithoutVersion.class)
 				.one(new PersonWithoutVersion(UUID.randomUUID(), "Walter", "White"));
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				PersonWithoutVersion fetched = ops.findById(PersonWithoutVersion.class).one(person.id());
 				ops.replaceById(PersonWithoutVersion.class).one(fetched);
-			});
-		}, TransactionFailedException.class, IllegalArgumentException.class);
+			}), TransactionFailedException.class, IllegalArgumentException.class);
 	}
 
 	@DisplayName("Entity must have non-zero CAS during replace")
@@ -325,11 +318,10 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 		// switchedPerson here will have CAS=0, which will fail
 		Person switchedPerson = new Person(person.getId(), "Dave", "Reynolds");
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				ops.replaceById(Person.class).one(switchedPerson);
-			});
-		}, TransactionFailedException.class, IllegalArgumentException.class);
+			}), TransactionFailedException.class, IllegalArgumentException.class);
 	}
 
 	@DisplayName("Entity must have CAS field during remove")
@@ -337,12 +329,11 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 	public void removeEntityWithoutCas() {
 		PersonWithoutVersion person = ops.insertById(PersonWithoutVersion.class)
 				.one(new PersonWithoutVersion(UUID.randomUUID(), "Walter", "White"));
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				PersonWithoutVersion fetched = ops.findById(PersonWithoutVersion.class).one(person.id());
 				ops.removeById(PersonWithoutVersion.class).oneEntity(fetched);
-			});
-		}, TransactionFailedException.class, IllegalArgumentException.class);
+			}), TransactionFailedException.class, IllegalArgumentException.class);
 	}
 
 	@DisplayName("removeById().one(id) isn't allowed in transactions, since we don't have the CAS")
@@ -350,12 +341,11 @@ public class SDKTransactionsTemplateIntegrationTests extends JavaIntegrationTest
 	public void removeEntityById() {
 		Person person = ops.insertById(Person.class).one(WalterWhite);
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(ctx -> {
 				Person p = ops.findById(Person.class).one(person.id());
 				ops.removeById(Person.class).one(p.getId().toString());
-			});
-		}, TransactionFailedException.class, IllegalArgumentException.class);
+			}), TransactionFailedException.class, IllegalArgumentException.class);
 	}
 
 	@DisplayName("Forcing CAS mismatch causes a transaction retry")

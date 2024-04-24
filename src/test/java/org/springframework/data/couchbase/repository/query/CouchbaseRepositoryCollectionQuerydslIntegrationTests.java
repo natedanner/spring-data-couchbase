@@ -78,7 +78,7 @@ public class CouchbaseRepositoryCollectionQuerydslIntegrationTests extends Colle
 
     @Autowired CouchbaseTemplate couchbaseTemplate;
 
-    SpringDataCouchbaseSerializer serializer = null;
+    SpringDataCouchbaseSerializer serializer;
 
     @BeforeEach
     public void beforeEach() {
@@ -87,7 +87,7 @@ public class CouchbaseRepositoryCollectionQuerydslIntegrationTests extends Colle
     }
 
 	@BeforeAll
-	static public void beforeAll() {
+	public static void beforeAll() {
 		callSuperBeforeAll(new Object() {});
 		ApplicationContext ac = new AnnotationConfigApplicationContext(
 				CouchbaseRepositoryCollectionQuerydslIntegrationTests.Config.class);
@@ -100,7 +100,7 @@ public class CouchbaseRepositoryCollectionQuerydslIntegrationTests extends Colle
 	}
 
 	@AfterAll
-	static public void afterAll() {
+	public static void afterAll() {
 		ApplicationContext ac = new AnnotationConfigApplicationContext(
 				CouchbaseRepositoryCollectionQuerydslIntegrationTests.Config.class);
 		CouchbaseTemplate template = (CouchbaseTemplate) ac.getBean("couchbaseTemplate");
@@ -164,7 +164,7 @@ public class CouchbaseRepositoryCollectionQuerydslIntegrationTests extends Colle
 			Iterable<AirlineCollectioned> result = airlineRepository.findAll(predicate);
 			assertNull(
 					comprises(result,
-							Arrays.stream(saved).filter(a -> !(a.getName().equals(united.getName()))).toArray(AirlineCollectioned[]::new)),
+							Arrays.stream(saved).filter(a -> !a.getName().equals(united.getName())).toArray(AirlineCollectioned[]::new)),
 					"[unexpected] -> [missing]");
 			assertEquals(" WHERE not( (name = $1) )", bq(predicate));
 		}
@@ -173,7 +173,7 @@ public class CouchbaseRepositoryCollectionQuerydslIntegrationTests extends Colle
 			Iterable<AirlineCollectioned> result = airlineRepository.findAll(predicate);
 			assertNull(
 					comprises(result,
-							Arrays.stream(saved).filter(a -> !(a.getName().equals(united.getName()))).toArray(AirlineCollectioned[]::new)),
+							Arrays.stream(saved).filter(a -> !a.getName().equals(united.getName())).toArray(AirlineCollectioned[]::new)),
 					"[unexpected] -> [missing]");
 			assertEquals(" WHERE not( (name = $1) )", bq(predicate));
 		}

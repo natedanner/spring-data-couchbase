@@ -72,12 +72,11 @@ public class CouchbaseTransactionalNonAllowableOperationsIntegrationTests extend
 	void test(Consumer<CouchbaseOperations> r) {
 		AtomicInteger tryCount = new AtomicInteger(0);
 
-		assertThrowsWithCause(() -> {
-			personService.doInTransaction(tryCount, (ops) -> {
+		assertThrowsWithCause(() ->
+			personService.doInTransaction(tryCount, ops -> {
 				r.accept(ops);
 				return null;
-			});
-		}, TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
+			}), TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
 
 		assertEquals(1, tryCount.get());
 	}
@@ -85,33 +84,29 @@ public class CouchbaseTransactionalNonAllowableOperationsIntegrationTests extend
 	@DisplayName("Using existsById() in a transaction is rejected at runtime")
 	@Test
 	public void existsById() {
-		test((ops) -> {
-			ops.existsById(Person.class).one(WalterWhite.id());
-		});
+		test(ops ->
+			ops.existsById(Person.class).one(WalterWhite.id()));
 	}
 
 	@DisplayName("Using findByAnalytics() in a transaction is rejected at runtime")
 	@Test
 	public void findByAnalytics() {
-		test((ops) -> {
-			ops.findByAnalytics(Person.class).one();
-		});
+		test(ops ->
+			ops.findByAnalytics(Person.class).one());
 	}
 
 	@DisplayName("Using findFromReplicasById() in a transaction is rejected at runtime")
 	@Test
 	public void findFromReplicasById() {
-		test((ops) -> {
-			ops.findFromReplicasById(Person.class).any(WalterWhite.id());
-		});
+		test(ops ->
+			ops.findFromReplicasById(Person.class).any(WalterWhite.id()));
 	}
 
 	@DisplayName("Using upsertById() in a transaction is rejected at runtime")
 	@Test
 	public void upsertById() {
-		test((ops) -> {
-			ops.upsertById(Person.class).one(WalterWhite);
-		});
+		test(ops ->
+			ops.upsertById(Person.class).one(WalterWhite));
 	}
 
 	@Service // this will work in the unit tests even without @Service because of explicit loading by @SpringJUnitConfig

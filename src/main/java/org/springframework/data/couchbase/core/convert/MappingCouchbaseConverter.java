@@ -555,7 +555,7 @@ public class MappingCouchbaseConverter extends AbstractCouchbaseConverter implem
 
 		if (idProperty != null && target.getId() == null) {
 			String id = accessor.getProperty(idProperty, String.class);
-			if (idProperty.isAnnotationPresent(GeneratedValue.class) && (id == null || id.equals(""))) {
+			if (idProperty.isAnnotationPresent(GeneratedValue.class) && (id == null || "".equals(id))) {
 				generatedValueInfo = idProperty.findAnnotation(GeneratedValue.class);
 				String generatedId = generateId(generatedValueInfo, prefixes, suffixes, idAttributes);
 				target.setId(generatedId);
@@ -677,9 +677,8 @@ public class MappingCouchbaseConverter extends AbstractCouchbaseConverter implem
 
 		Optional<Class<?>> basicTargetType = conversions.getCustomWriteTarget(source.getClass());
 		if (basicTargetType.isPresent()) {
-			basicTargetType.ifPresent(it -> {
-				target.put(name, conversionService.convert(source, it));
-			});
+			basicTargetType.ifPresent(it ->
+				target.put(name, conversionService.convert(source, it)));
 
 			return;
 		}
@@ -974,8 +973,7 @@ public class MappingCouchbaseConverter extends AbstractCouchbaseConverter implem
 			try {
 				return (R) conversions.getPropertyValueConversions().getValueConverter(prop).read(value,
 						new CouchbaseConversionContext(prop, this, null));
-			} catch (ConverterHasNoConversion noConversion) {
-				; // ignore
+			} catch (ConverterHasNoConversion noConversion) { // ignore
 			}
 		}
 		if (conversions.hasCustomReadTarget(value.getClass(), rawType)) {
@@ -1113,7 +1111,7 @@ public class MappingCouchbaseConverter extends AbstractCouchbaseConverter implem
 					value = source.get(property.getFieldName());
 					noDecrypt = true;
 				} else if (value != null
-						&& !((value instanceof CouchbaseDocument) && (((CouchbaseDocument) value)).containsKey("kid"))) {
+						&& !((value instanceof CouchbaseDocument) && ((CouchbaseDocument) value).containsKey("kid"))) {
 					noDecrypt = true;
 					// TODO - should we throw an exception, or just ignore the problem of not being encrypted with noDecrypt=true?
 					throw new RuntimeException("should have been encrypted, but is not " + maybeFieldName);

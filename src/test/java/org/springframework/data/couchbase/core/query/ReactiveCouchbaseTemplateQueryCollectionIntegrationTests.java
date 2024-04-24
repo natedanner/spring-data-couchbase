@@ -327,7 +327,7 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 
 		} finally {
 			couchbaseTemplate.removeById().inCollection(collectionName)
-					.all(Arrays.stream(iatas).map((iata) -> "airports::" + iata).collect(Collectors.toSet()));
+					.all(Arrays.stream(iatas).map(iata -> "airports::" + iata).collect(Collectors.toSet()));
 		}
 	}
 
@@ -368,7 +368,7 @@ class ReactiveCouchbaseTemplateQueryCollectionIntegrationTests extends Collectio
 
 		} finally {
 			reactiveCouchbaseTemplate.removeById().inCollection(collectionName)
-					.all(Arrays.stream(iatas).map((iata) -> "airports::" + iata).collect(Collectors.toSet())).collectList()
+					.all(Arrays.stream(iatas).map(iata -> "airports::" + iata).collect(Collectors.toSet())).collectList()
 					.block();
 		}
 	}

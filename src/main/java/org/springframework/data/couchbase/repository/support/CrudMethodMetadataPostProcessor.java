@@ -122,10 +122,11 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
 
 			MethodInvocation mi = currentInvocation.get();
 
-			if (mi == null)
+			if (mi == null) {
 				throw new IllegalStateException(
 						"No MethodInvocation found: Check that an AOP invocation is in progress, and that the "
 								+ "CrudMethodMetadataPopulatingMethodInterceptor is upfront in the interceptor chain.");
+			}
 			return mi;
 		}
 
@@ -205,8 +206,8 @@ public class CrudMethodMetadataPostProcessor implements RepositoryProxyPostProce
 			this.method = method;
 			String n = method.getName();
 			// internal methods
-			if (n.equals("getEntityInformation") || n.equals("getOperations") || n.equals("withOptions")
-					|| n.equals("withOptions") || n.equals("withScope")) {
+			if ("getEntityInformation".equals(n) || "getOperations".equals(n) || "withOptions".equals(n)
+					|| "withOptions".equals(n) || "withScope".equals(n)) {
 				this.scanConsistency = null;
 				this.scope = null;
 				this.collection = null;

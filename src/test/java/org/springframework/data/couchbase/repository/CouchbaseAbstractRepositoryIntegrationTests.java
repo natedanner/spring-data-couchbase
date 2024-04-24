@@ -123,10 +123,9 @@ public class CouchbaseAbstractRepositoryIntegrationTests extends ClusterAwareInt
 			// that has an getAliasFor(info) that just returns getType().getName().
 			// Our CustomMappingCouchbaseConverter uses a TypeBasedCouchbaseTypeMapper that will
 			// use the DocumentType annotation
-			MappingCouchbaseConverter converter = new AbstractingMappingCouchbaseConverter(couchbaseMappingContext,
+			return new AbstractingMappingCouchbaseConverter(couchbaseMappingContext,
 					typeKey(),
 					couchbaseCustomConversions);
-			return converter;
 		}
 
 	}

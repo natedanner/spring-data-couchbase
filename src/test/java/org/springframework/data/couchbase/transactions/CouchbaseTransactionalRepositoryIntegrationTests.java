@@ -113,12 +113,11 @@ public class CouchbaseTransactionalRepositoryIntegrationTests extends JavaIntegr
 	public void saveRolledBack() {
 		String id = UUID.randomUUID().toString();
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			userService.run(repo -> {
 				User user = repo.save(new User(id, "Ada", "Lovelace"));
 				SimulateFailureException.throwEx("fail");
-			});
-		}, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+			}), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
 		User user = operations.findById(User.class).one(id);
 		assertNull(user);

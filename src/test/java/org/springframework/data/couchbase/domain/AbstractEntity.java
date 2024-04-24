@@ -62,7 +62,7 @@ public class AbstractEntity {
 			return true;
 		}
 
-		if (this.id == null || obj == null || !(this.getClass().equals(obj.getClass()))) {
+		if (this.id == null || obj == null || !this.getClass().equals(obj.getClass())) {
 			return false;
 		}
 

@@ -107,9 +107,7 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
   @Test
   public void committedInsert() {
     AtomicInteger tryCount = new AtomicInteger(0);
-    Person inserted = personService.doInTransaction(tryCount, (ops) -> {
-      return ops.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite.withIdFirstname());
-    });
+    Person inserted = personService.doInTransaction(tryCount, ops -> ops.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite.withIdFirstname()));
 
     Person fetched = operations.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(inserted.id());
     assertEquals(inserted.getFirstname(), fetched.getFirstname());
@@ -122,7 +120,7 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger();
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite);
 
-    personService.fetchAndReplace(person.id(), tryCount, (p) -> {
+    personService.fetchAndReplace(person.id(), tryCount, p -> {
       p.setFirstname("changed");
       return p;
     });
@@ -151,9 +149,7 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger();
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite.withIdFirstname());
 
-    List<RemoveResult> removed = personService.doInTransaction(tryCount, ops -> {
-      return ops.removeByQuery(Person.class).inScope(scopeName).inCollection(collectionName).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all();
-    });
+    List<RemoveResult> removed = personService.doInTransaction(tryCount, ops -> ops.removeByQuery(Person.class).inScope(scopeName).inCollection(collectionName).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all());
 
     Person fetched = operations.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(person.id());
     assertNull(fetched);
@@ -167,9 +163,7 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger(0);
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite.withIdFirstname());
 
-    List<Person> found = personService.doInTransaction(tryCount, ops -> {
-      return ops.findByQuery(Person.class).inScope(scopeName).inCollection(collectionName).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all();
-    });
+    List<Person> found = personService.doInTransaction(tryCount, ops -> ops.findByQuery(Person.class).inScope(scopeName).inCollection(collectionName).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all());
 
     assertEquals(1, found.size());
   }
@@ -180,13 +174,12 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger();
     AtomicReference<String> id = new AtomicReference<>();
 
-    assertThrowsWithCause(() -> {
-      personService.doInTransaction(tryCount, (ops) -> {
+    assertThrowsWithCause(() ->
+      personService.doInTransaction(tryCount, ops -> {
         ops.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite);
         id.set(WalterWhite.id());
         throw new SimulateFailureException();
-      });
-    }, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+      }), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
     Person fetched = operations.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(id.get());
     assertNull(fetched);
@@ -199,13 +192,12 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger(0);
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite);
 
-    assertThrowsWithCause(() -> {
-      personService.doInTransaction(tryCount, (ops) -> {
+    assertThrowsWithCause(() ->
+      personService.doInTransaction(tryCount, ops -> {
         Person p = ops.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(person.id());
         ops.replaceById(Person.class).inScope(scopeName).inCollection(collectionName).one(p.withFirstName("changed"));
         throw new SimulateFailureException();
-      });
-    }, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+      }), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
     Person fetched = operations.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(person.id());
     assertEquals(person.getFirstname(), fetched.getFirstname());
@@ -218,13 +210,12 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger(0);
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite);
 
-    assertThrowsWithCause(() -> {
-      personService.doInTransaction(tryCount, (ops) -> {
+    assertThrowsWithCause(() ->
+      personService.doInTransaction(tryCount, ops -> {
         Person p = ops.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(person.id());
         ops.removeById(Person.class).inScope(scopeName).inCollection(collectionName).oneEntity(p);
         throw new SimulateFailureException();
-      });
-    }, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+      }), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
     Person fetched = operations.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(person.id());
     assertNotNull(fetched);
@@ -237,12 +228,11 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger();
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite.withIdFirstname());
 
-    assertThrowsWithCause(() -> {
+    assertThrowsWithCause(() ->
       personService.doInTransaction(tryCount, ops -> {
         ops.removeByQuery(Person.class).inScope(scopeName).inCollection(collectionName).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all();
         throw new SimulateFailureException();
-      });
-    }, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+      }), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
     Person fetched = operations.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(person.id());
     assertNotNull(fetched);
@@ -255,21 +245,19 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
     AtomicInteger tryCount = new AtomicInteger();
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite.withIdFirstname());
 
-    assertThrowsWithCause(() -> {
+    assertThrowsWithCause(() ->
       personService.doInTransaction(tryCount, ops -> {
         ops.findByQuery(Person.class).inScope(scopeName).inCollection(collectionName).matching(QueryCriteria.where("firstname").eq(person.getFirstname())).all();
         throw new SimulateFailureException();
-      });
-    }, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+      }), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
     assertEquals(1, tryCount.get());
   }
 
   @Test
   public void shouldRollbackAfterException() {
-    assertThrowsWithCause(() -> {
-      personService.insertThenThrow();
-    }, TransactionSystemUnambiguousException.class, SimulateFailureException.class);
+    assertThrowsWithCause(() ->
+      personService.insertThenThrow(), TransactionSystemUnambiguousException.class, SimulateFailureException.class);
 
     Long count = operations.findByQuery(Person.class).withConsistency(REQUEST_PLUS).inScope(scopeName).inCollection(collectionName).count();
     assertEquals(0, count, "should have done roll back and left 0 entries");
@@ -357,13 +345,12 @@ public class CouchbaseTransactionalTemplateCollectionIntegrationTests extends Co
   public void removeEntityById() {
     AtomicInteger tryCount = new AtomicInteger();
     Person person = operations.insertById(Person.class).inScope(scopeName).inCollection(collectionName).one(WalterWhite);
-    assertThrowsWithCause(() -> {
-      personService.doInTransaction(tryCount, (ops) -> {
+    assertThrowsWithCause(() ->
+      personService.doInTransaction(tryCount, ops -> {
         Person p = ops.findById(Person.class).inScope(scopeName).inCollection(collectionName).one(person.id());
         ops.removeById(Person.class).inScope(scopeName).inCollection(collectionName).one(p.id());
         return p;
-      });
-    }, TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
+      }), TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
   }
 
   @Service // this will work in the unit tests even without @Service because of explicit loading by @SpringJUnitConfig

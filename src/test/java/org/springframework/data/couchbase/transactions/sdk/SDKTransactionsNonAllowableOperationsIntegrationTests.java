@@ -73,14 +73,13 @@ public class SDKTransactionsNonAllowableOperationsIntegrationTests extends JavaI
 	void test(Consumer<CouchbaseOperations> r) {
 		AtomicInteger tryCount = new AtomicInteger(0);
 
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			couchbaseClientFactory.getCluster().transactions().run(ignored -> {
-				personService.doInService(tryCount, (ops) -> {
+				personService.doInService(tryCount, ops -> {
 					r.accept(ops);
 					return null;
 				});
-			});
-		}, TransactionFailedException.class, IllegalArgumentException.class);
+			}), TransactionFailedException.class, IllegalArgumentException.class);
 
 		assertEquals(1, tryCount.get());
 	}
@@ -88,33 +87,29 @@ public class SDKTransactionsNonAllowableOperationsIntegrationTests extends JavaI
 	@DisplayName("Using existsById() in a transaction is rejected at runtime")
 	@Test
 	public void existsById() {
-		test((ops) -> {
-			ops.existsById(Person.class).one(WalterWhite.id());
-		});
+		test(ops ->
+			ops.existsById(Person.class).one(WalterWhite.id()));
 	}
 
 	@DisplayName("Using findByAnalytics() in a transaction is rejected at runtime")
 	@Test
 	public void findByAnalytics() {
-		test((ops) -> {
-			ops.findByAnalytics(Person.class).one();
-		});
+		test(ops ->
+			ops.findByAnalytics(Person.class).one());
 	}
 
 	@DisplayName("Using findFromReplicasById() in a transaction is rejected at runtime")
 	@Test
 	public void findFromReplicasById() {
-		test((ops) -> {
-			ops.findFromReplicasById(Person.class).any(WalterWhite.id());
-		});
+		test(ops ->
+			ops.findFromReplicasById(Person.class).any(WalterWhite.id()));
 	}
 
 	@DisplayName("Using upsertById() in a transaction is rejected at runtime")
 	@Test
 	public void upsertById() {
-		test((ops) -> {
-			ops.upsertById(Person.class).one(WalterWhite);
-		});
+		test(ops ->
+			ops.upsertById(Person.class).one(WalterWhite));
 	}
 
 	// This is intentionally not a @Transactional service

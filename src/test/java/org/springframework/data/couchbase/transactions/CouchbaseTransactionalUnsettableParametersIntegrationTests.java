@@ -82,12 +82,11 @@ public class CouchbaseTransactionalUnsettableParametersIntegrationTests extends 
 	void test(Consumer<CouchbaseOperations> r) {
 		AtomicInteger tryCount = new AtomicInteger(0);
 
-		assertThrowsWithCause(() -> {
-			personService.doInTransaction(tryCount, (ops) -> {
+		assertThrowsWithCause(() ->
+			personService.doInTransaction(tryCount, ops -> {
 				r.accept(ops);
 				return null;
-			});
-		}, TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
+			}), TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
 
 		assertEquals(1, tryCount.get());
 	}
@@ -95,161 +94,141 @@ public class CouchbaseTransactionalUnsettableParametersIntegrationTests extends 
 	@DisplayName("Using insertById().withDurability - the PersistTo overload - in a transaction is rejected at runtime")
 	@Test
 	public void insertWithDurability() {
-		test((ops) -> {
-			ops.insertById(Person.class).withDurability(PersistTo.ONE, ReplicateTo.ONE).one(WalterWhite);
-		});
+		test(ops ->
+			ops.insertById(Person.class).withDurability(PersistTo.ONE, ReplicateTo.ONE).one(WalterWhite));
 	}
 
 	@DisplayName("Using insertById() with Durability set via annotations in a transaction is rejected at runtime")
 	@Test
 	public void insertWithDurabilityAnnotated() {
-		test((ops) -> {
-			ops.insertById(PersonWithDurability.class).one(new PersonWithDurability("Walter", "White"));
-		});
+		test(ops ->
+			ops.insertById(PersonWithDurability.class).one(new PersonWithDurability("Walter", "White")));
 	}
 
 	@DisplayName("Using insertById().withExpiry in a transaction is rejected at runtime")
 	@Test
 	public void insertWithExpiry() {
-		test((ops) -> {
-			ops.insertById(Person.class).withExpiry(Duration.ofSeconds(3)).one(WalterWhite);
-		});
+		test(ops ->
+			ops.insertById(Person.class).withExpiry(Duration.ofSeconds(3)).one(WalterWhite));
 	}
 
 	@DisplayName("Using insertById().withDurability(durabilityLevel) in a transaction is rejected at runtime")
 	@Test
 	public void insertWithDurability2() {
-		test((ops) -> {
-			ops.insertById(Person.class).withDurability(DurabilityLevel.MAJORITY).one(WalterWhite);
-		});
+		test(ops ->
+			ops.insertById(Person.class).withDurability(DurabilityLevel.MAJORITY).one(WalterWhite));
 	}
 
 	@DisplayName("Using insertById with Durability set via annotations in a transaction is rejected at runtime")
 	@Test
 	public void insertWithDurabilityAnnotated2() {
-		test((ops) -> {
-			ops.insertById(PersonWithDurability2.class).one(new PersonWithDurability2("Walter", "White"));
-		});
+		test(ops ->
+			ops.insertById(PersonWithDurability2.class).one(new PersonWithDurability2("Walter", "White")));
 	}
 
 	@DisplayName("Using insertById().withOptions in a transaction is rejected at runtime")
 	@Test
 	public void insertWithOptions() {
-		test((ops) -> {
-			ops.insertById(Person.class).withOptions(InsertOptions.insertOptions()).one(WalterWhite);
-		});
+		test(ops ->
+			ops.insertById(Person.class).withOptions(InsertOptions.insertOptions()).one(WalterWhite));
 	}
 
 	@DisplayName("Using replaceById().withDurability - the PersistTo overload - in a transaction is rejected at runtime")
 	@Test
 	public void replaceWithDurability() {
-		test((ops) -> {
-			ops.replaceById(Person.class).withDurability(PersistTo.ONE, ReplicateTo.ONE).one(WalterWhite);
-		});
+		test(ops ->
+			ops.replaceById(Person.class).withDurability(PersistTo.ONE, ReplicateTo.ONE).one(WalterWhite));
 	}
 
 	@DisplayName("Using replaceById() with Durability set via annotations in a transaction is rejected at runtime")
 	@Test
 	public void replaceWithAnnotatedDurability() {
-		test((ops) -> {
-			ops.replaceById(PersonWithDurability.class).one(new PersonWithDurability("Walter", "White"));
-		});
+		test(ops ->
+			ops.replaceById(PersonWithDurability.class).one(new PersonWithDurability("Walter", "White")));
 	}
 
 	@DisplayName("Using replaceById().withExpiry in a transaction is rejected at runtime")
 	@Test
 	public void replaceWithExpiry() {
-		test((ops) -> {
-			ops.replaceById(Person.class).withExpiry(Duration.ofSeconds(3)).one(WalterWhite);
-		});
+		test(ops ->
+			ops.replaceById(Person.class).withExpiry(Duration.ofSeconds(3)).one(WalterWhite));
 	}
 
 	@DisplayName("Using replaceById().withDurability(durabilityLevel) in a transaction is rejected at runtime")
 	@Test
 	public void replaceWithDurability2() {
-		test((ops) -> {
-			ops.replaceById(Person.class).withDurability(DurabilityLevel.MAJORITY).one(WalterWhite);
-		});
+		test(ops ->
+			ops.replaceById(Person.class).withDurability(DurabilityLevel.MAJORITY).one(WalterWhite));
 	}
 
 	@DisplayName("Using replaceById() with Durability set via annotations in a transaction is rejected at runtime")
 	@Test
 	public void replaceWithAnnotatedDurability2() {
-		test((ops) -> {
-			ops.replaceById(PersonWithDurability2.class).one(new PersonWithDurability2("Walter", "White"));
-		});
+		test(ops ->
+			ops.replaceById(PersonWithDurability2.class).one(new PersonWithDurability2("Walter", "White")));
 	}
 
 	@DisplayName("Using replaceById().withOptions in a transaction is rejected at runtime")
 	@Test
 	public void replaceWithOptions() {
-		test((ops) -> {
-			ops.replaceById(Person.class).withOptions(ReplaceOptions.replaceOptions()).one(WalterWhite);
-		});
+		test(ops ->
+			ops.replaceById(Person.class).withOptions(ReplaceOptions.replaceOptions()).one(WalterWhite));
 	}
 
 	@DisplayName("Using removeById().withDurability - the PersistTo overload - in a transaction is rejected at runtime")
 	@Test
 	public void removeWithDurability() {
-		test((ops) -> {
-			ops.removeById(Person.class).withDurability(PersistTo.ONE, ReplicateTo.ONE).oneEntity(WalterWhite);
-		});
+		test(ops ->
+			ops.removeById(Person.class).withDurability(PersistTo.ONE, ReplicateTo.ONE).oneEntity(WalterWhite));
 	}
 
 	@DisplayName("Using removeById() with Durability set via annotations in a transaction is rejected at runtime")
 	@Test
 	public void removeWithAnnotatedDurability() {
-		test((ops) -> {
-			ops.removeById(PersonWithDurability.class).oneEntity(new PersonWithDurability("Walter", "White"));
-		});
+		test(ops ->
+			ops.removeById(PersonWithDurability.class).oneEntity(new PersonWithDurability("Walter", "White")));
 	}
 
 	@DisplayName("Using removeById().withDurability(durabilityLevel) in a transaction is rejected at runtime")
 	@Test
 	public void removeWithDurability2() {
-		test((ops) -> {
-			ops.removeById(Person.class).withDurability(DurabilityLevel.MAJORITY).oneEntity(WalterWhite);
-		});
+		test(ops ->
+			ops.removeById(Person.class).withDurability(DurabilityLevel.MAJORITY).oneEntity(WalterWhite));
 	}
 
 	@DisplayName("Using removeById().withDurability(durabilityLevel) in a transaction is rejected at runtime")
 	@Test
 	public void removeWithAnnotatedDurability2() {
-		test((ops) -> {
-			ops.removeById(PersonWithDurability2.class).oneEntity(new PersonWithDurability2("Walter", "White"));
-		});
+		test(ops ->
+			ops.removeById(PersonWithDurability2.class).oneEntity(new PersonWithDurability2("Walter", "White")));
 	}
 
 	@DisplayName("Using removeById().withOptions in a transaction is rejected at runtime")
 	@Test
 	public void removeWithOptions() {
-		test((ops) -> {
-			ops.removeById(Person.class).withOptions(RemoveOptions.removeOptions()).oneEntity(WalterWhite);
-		});
+		test(ops ->
+			ops.removeById(Person.class).withOptions(RemoveOptions.removeOptions()).oneEntity(WalterWhite));
 	}
 
 	@DisplayName("Using findById().withExpiry in a transaction is rejected at runtime")
 	@Test
 	public void findWithExpiry() {
-		test((ops) -> {
-			ops.replaceById(Person.class).withExpiry(Duration.ofSeconds(3)).one(WalterWhite);
-		});
+		test(ops ->
+			ops.replaceById(Person.class).withExpiry(Duration.ofSeconds(3)).one(WalterWhite));
 	}
 
 	@DisplayName("Using findById().project in a transaction is rejected at runtime")
 	@Test
 	public void findProject() {
-		test((ops) -> {
-			ops.findById(Person.class).project(new String[] { "someField" }).one(WalterWhite.id());
-		});
+		test(ops ->
+			ops.findById(Person.class).project(new String[] { "someField" }).one(WalterWhite.id()));
 	}
 
 	@DisplayName("Using findById().withOptions in a transaction is rejected at runtime")
 	@Test
 	public void findWithOptions() {
-		test((ops) -> {
-			ops.findById(Person.class).withOptions(GetOptions.getOptions()).one(WalterWhite.id());
-		});
+		test(ops ->
+			ops.findById(Person.class).withOptions(GetOptions.getOptions()).one(WalterWhite.id()));
 	}
 
 	@Service // this will work in the unit tests even without @Service because of explicit loading by @SpringJUnitConfig

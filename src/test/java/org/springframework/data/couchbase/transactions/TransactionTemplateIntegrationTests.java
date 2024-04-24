@@ -125,9 +125,8 @@ public class TransactionTemplateIntegrationTests extends JavaIntegrationTests {
 	@DisplayName("A basic golden path insert should succeed")
 	@Test
 	public void committedInsert() {
-		RunResult rr = doInTransaction(status -> {
-			ops.insertById(Person.class).one(WalterWhite);
-		});
+		RunResult rr = doInTransaction(status ->
+			ops.insertById(Person.class).one(WalterWhite));
 
 		Person fetched = ops.findById(Person.class).one(WalterWhite.id());
 		assertEquals(WalterWhite.getFirstname(), fetched.getFirstname());
@@ -286,12 +285,11 @@ public class TransactionTemplateIntegrationTests extends JavaIntegrationTests {
 	public void replaceEntityWithoutCas() {
 		PersonWithoutVersion person = ops.insertById(PersonWithoutVersion.class)
 				.one(new PersonWithoutVersion(UUID.randomUUID(), "Walter", "White"));
-		assertThrowsWithCause(() -> {
+		assertThrowsWithCause(() ->
 			doInTransaction(status -> {
 				PersonWithoutVersion fetched = ops.findById(PersonWithoutVersion.class).one(person.id());
 				ops.replaceById(PersonWithoutVersion.class).one(fetched);
-			});
-		}, TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
+			}), TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
 
 	}
 
@@ -303,9 +301,8 @@ public class TransactionTemplateIntegrationTests extends JavaIntegrationTests {
 		// switchedPerson here will have CAS=0, which will fail
 		Person switchedPerson = new Person(person.getId(), "Dave", "Reynolds");
 
-		assertThrowsWithCause(() -> doInTransaction(status -> {
-			ops.replaceById(Person.class).one(switchedPerson);
-		}), TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
+		assertThrowsWithCause(() -> doInTransaction(status ->
+			ops.replaceById(Person.class).one(switchedPerson)), TransactionSystemUnambiguousException.class, IllegalArgumentException.class);
 	}
 
 	@DisplayName("Entity must have CAS field during remove")
@@ -365,11 +362,10 @@ public class TransactionTemplateIntegrationTests extends JavaIntegrationTests {
 		TransactionTemplate template2 = new TransactionTemplate(transactionManager);
 		template2.setPropagationBehavior(TransactionDefinition.PROPAGATION_MANDATORY);
 
-		transactionTemplate.executeWithoutResult(status -> {
+		transactionTemplate.executeWithoutResult(status ->
 			template2.executeWithoutResult(status2 -> {
 				Person person = ops.insertById(Person.class).one(WalterWhite);
-			});
-		});
+			}));
 
 		Person fetched = ops.findById(Person.class).one(WalterWhite.id());
 		assertEquals("Walter", fetched.getFirstname());

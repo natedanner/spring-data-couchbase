@@ -150,9 +150,8 @@ public class BasicCouchbasePersistentPropertyTests {
 		BasicCouchbasePersistentEntity<TestIdField> test = new BasicCouchbasePersistentEntity<>(
 			TypeInformation.of(TestIdField.class));
 		test.addPersistentProperty(springIdProperty);
-		assertThatExceptionOfType(MappingException.class).isThrownBy(() -> {
-			test.addPersistentProperty(idProperty);
-		});
+		assertThatExceptionOfType(MappingException.class).isThrownBy(() ->
+			test.addPersistentProperty(idProperty));
 	}
 
 	@Test
@@ -170,9 +169,8 @@ public class BasicCouchbasePersistentPropertyTests {
 		BasicCouchbasePersistentEntity<TestIdField> test = new BasicCouchbasePersistentEntity<>(
 			TypeInformation.of(TestIdField.class));
 		test.addPersistentProperty(springIdProperty);
-		assertThatExceptionOfType(MappingException.class).isThrownBy(() -> {
-			test.addPersistentProperty(idProperty);
-		});
+		assertThatExceptionOfType(MappingException.class).isThrownBy(() ->
+			test.addPersistentProperty(idProperty));
 	}
 
 	/**

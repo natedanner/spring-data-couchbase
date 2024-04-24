@@ -77,9 +77,8 @@ public class CouchbaseTransactionalOptionsIntegrationTests extends JavaIntegrati
 	public void timeout() {
 		long start = System.nanoTime();
 		Person person = operations.insertById(Person.class).one(WalterWhite);
-		assertThrowsWithCause(() -> {
-			personService.timeout(person.id());
-		}, TransactionSystemUnambiguousException.class, AttemptExpiredException.class);
+		assertThrowsWithCause(() ->
+			personService.timeout(person.id()), TransactionSystemUnambiguousException.class, AttemptExpiredException.class);
 		Duration timeTaken = Duration.ofNanos(System.nanoTime() - start);
 		assertTrue(timeTaken.toMillis() >= 2000);
 		assertTrue(timeTaken.toMillis() < 10_000); // Default transaction timeout is 15s
@@ -88,9 +87,8 @@ public class CouchbaseTransactionalOptionsIntegrationTests extends JavaIntegrati
 	@DisplayName("@Transactional(isolation = Isolation.ANYTHING_BUT_READ_COMMITTED) will fail")
 	@Test
 	public void unsupportedIsolation() {
-		assertThrowsWithCause(() -> {
-			personService.unsupportedIsolation();
-		}, IllegalArgumentException.class);
+		assertThrowsWithCause(() ->
+			personService.unsupportedIsolation(), IllegalArgumentException.class);
 
 	}
 
